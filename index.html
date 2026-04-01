@@ -1,0 +1,751 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>YOUR NAME</title>
+<link href="https://fonts.googleapis.com/css2?family=Helvetica+Neue:wght@300;400&family=EB+Garamond:ital,wght@0,400;1,400&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --white: #ffffff;
+    --black: #111111;
+    --mid: #999999;
+    --light: #f0f0f0;
+    --font-sans: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+    --font-serif: 'EB Garamond', Georgia, serif;
+  }
+
+  html { font-size: 16px; }
+
+  body {
+    background: var(--white);
+    color: var(--black);
+    font-family: var(--font-sans);
+    font-weight: 300;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+  }
+
+  a { color: inherit; text-decoration: none; }
+
+  /* ── HEADER ── */
+  header {
+    position: fixed; top: 0; left: 0; right: 0;
+    z-index: 100;
+    background: var(--white);
+    padding: 1.6rem 2.4rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+  }
+
+  .site-name {
+    font-size: 0.8rem;
+    font-weight: 400;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    line-height: 1.6;
+  }
+
+  .header-right {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    gap: 0.3rem;
+  }
+
+  nav { display: flex; gap: 2rem; }
+  nav a {
+    font-size: 0.75rem;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: var(--black);
+    transition: color 0.2s;
+  }
+  nav a:hover { color: var(--mid); }
+  nav a.active { border-bottom: 1px solid var(--black); }
+
+  .header-links {
+    display: flex; gap: 1.4rem;
+  }
+  .header-links a {
+    font-size: 0.72rem;
+    letter-spacing: 0.05em;
+    color: var(--mid);
+    transition: color 0.2s;
+  }
+  .header-links a:hover { color: var(--black); }
+
+  /* ── MAIN ── */
+  main {
+    padding-top: 80px;
+    flex: 1;
+  }
+
+  /* ── FILTER BAR ── */
+  .filter-bar {
+    padding: 1.2rem 2.4rem;
+    display: flex;
+    gap: 1.8rem;
+    align-items: center;
+    border-bottom: 1px solid var(--light);
+  }
+  .filter-btn {
+    font-family: var(--font-sans);
+    font-size: 0.72rem;
+    font-weight: 300;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: var(--mid);
+    background: none;
+    border: none;
+    cursor: pointer;
+    padding: 0;
+    transition: color 0.2s;
+  }
+  .filter-btn:hover { color: var(--black); }
+  .filter-btn.active { color: var(--black); border-bottom: 1px solid var(--black); }
+
+  /* ── PROJECT GRID ── */
+  .projects {
+    padding: 0 2.4rem 4rem;
+  }
+
+  /* Year label row */
+  .year-label {
+    font-size: 0.68rem;
+    letter-spacing: 0.1em;
+    color: var(--mid);
+    text-transform: uppercase;
+    padding: 2rem 0 1rem;
+    display: none;
+  }
+
+  /* Grid */
+  .grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 3rem 3rem;
+    padding-top: 2.5rem;
+  }
+
+  /* Project card */
+  .project-card {
+    cursor: pointer;
+    opacity: 0;
+    transform: translateY(16px);
+    transition: opacity 0.5s ease, transform 0.5s ease;
+  }
+  .project-card.visible {
+    opacity: 1;
+    transform: translateY(0);
+  }
+  .project-card[data-hidden="true"] {
+    display: none;
+  }
+
+  .project-img-wrap {
+    width: 100%;
+    overflow: hidden;
+    background: var(--light);
+    position: relative;
+  }
+
+  /* Placeholder image with aspect ratio */
+  .project-img-wrap::before {
+    content: '';
+    display: block;
+    padding-top: 66%;
+  }
+
+  .project-img-wrap img {
+    position: absolute;
+    inset: 0;
+    width: 100%; height: 100%;
+    object-fit: cover;
+    transition: transform 0.5s ease;
+  }
+
+  /* Placeholder SVG for when no image */
+  .project-img-wrap .placeholder-svg {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  .project-img-wrap .placeholder-svg svg {
+    width: 40%; opacity: 0.18;
+  }
+
+  .project-card:hover .project-img-wrap img,
+  .project-card:hover .project-img-wrap .placeholder-svg svg {
+    transform: scale(1.02);
+  }
+
+  .project-meta {
+    margin-top: 0.75rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.2rem;
+  }
+
+  .project-title {
+    font-size: 0.8rem;
+    font-weight: 400;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    line-height: 1.4;
+  }
+
+  .project-year-tag {
+    font-size: 0.68rem;
+    color: var(--mid);
+    letter-spacing: 0.04em;
+  }
+
+  /* ── ABOUT PAGE ── */
+  #about-page {
+    display: none;
+    padding: 4rem 2.4rem;
+    max-width: 700px;
+  }
+  #about-page.active { display: block; }
+
+  .about-name {
+    font-family: var(--font-serif);
+    font-size: 2.2rem;
+    font-weight: 400;
+    font-style: italic;
+    margin-bottom: 2rem;
+    line-height: 1.2;
+  }
+
+  .about-body p {
+    font-size: 0.9rem;
+    line-height: 1.9;
+    color: #333;
+    margin-bottom: 1.2rem;
+    font-weight: 300;
+  }
+
+  .about-info {
+    margin-top: 2.5rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.6rem;
+  }
+
+  .about-info-row {
+    display: flex;
+    gap: 1.5rem;
+    font-size: 0.75rem;
+    letter-spacing: 0.04em;
+  }
+  .about-info-label { color: var(--mid); min-width: 80px; text-transform: uppercase; }
+  .about-info-value { color: var(--black); }
+
+  /* ── BLOG PAGE ── */
+  #blog-page {
+    display: none;
+    padding: 4rem 2.4rem;
+  }
+  #blog-page.active { display: block; }
+
+  .blog-list { display: flex; flex-direction: column; gap: 0; }
+  .blog-item {
+    padding: 1.4rem 0;
+    border-bottom: 1px solid var(--light);
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    gap: 2rem;
+    cursor: pointer;
+    transition: opacity 0.2s;
+  }
+  .blog-item:hover { opacity: 0.6; }
+  .blog-title {
+    font-size: 0.82rem;
+    letter-spacing: 0.03em;
+    line-height: 1.5;
+  }
+  .blog-date {
+    font-size: 0.68rem;
+    color: var(--mid);
+    white-space: nowrap;
+    letter-spacing: 0.05em;
+  }
+
+  /* ── PROJECT DETAIL (lightbox style) ── */
+  #project-detail {
+    display: none;
+    position: fixed;
+    inset: 0;
+    background: var(--white);
+    z-index: 200;
+    overflow-y: auto;
+    padding: 2rem 2.4rem 4rem;
+  }
+  #project-detail.active { display: block; }
+
+  .detail-back {
+    font-size: 0.72rem;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--mid);
+    cursor: pointer;
+    margin-bottom: 2.5rem;
+    display: inline-block;
+    transition: color 0.2s;
+  }
+  .detail-back:hover { color: var(--black); }
+
+  .detail-title {
+    font-size: 0.88rem;
+    font-weight: 400;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    margin-bottom: 0.4rem;
+  }
+  .detail-year {
+    font-size: 0.68rem;
+    color: var(--mid);
+    letter-spacing: 0.05em;
+    margin-bottom: 2.5rem;
+  }
+
+  .detail-images {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 1rem;
+    margin-bottom: 2.5rem;
+  }
+
+  .detail-img-slot {
+    width: 100%;
+    background: var(--light);
+    position: relative;
+  }
+  .detail-img-slot::before {
+    content: '';
+    display: block;
+    padding-top: 60%;
+  }
+  .detail-img-slot img {
+    position: absolute;
+    inset: 0;
+    width: 100%; height: 100%;
+    object-fit: cover;
+  }
+  .detail-img-placeholder {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  .detail-img-placeholder svg { width: 30%; opacity: 0.12; }
+
+  .detail-desc {
+    max-width: 600px;
+    font-size: 0.85rem;
+    line-height: 1.85;
+    color: #444;
+    font-weight: 300;
+  }
+
+  /* ── FOOTER ── */
+  footer {
+    padding: 1.5rem 2.4rem;
+    border-top: 1px solid var(--light);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+  footer p {
+    font-size: 0.65rem;
+    color: var(--mid);
+    letter-spacing: 0.05em;
+  }
+  .footer-links { display: flex; gap: 1.4rem; }
+  .footer-links a {
+    font-size: 0.65rem;
+    color: var(--mid);
+    letter-spacing: 0.05em;
+    transition: color 0.2s;
+  }
+  .footer-links a:hover { color: var(--black); }
+
+  /* ── RESPONSIVE ── */
+  @media (max-width: 700px) {
+    header { padding: 1.2rem 1.2rem; flex-wrap: wrap; gap: 0.8rem; }
+    .header-right { align-items: flex-start; }
+    nav { gap: 1.2rem; }
+    .filter-bar { padding: 1rem 1.2rem; gap: 1.2rem; flex-wrap: wrap; }
+    .projects { padding: 0 1.2rem 3rem; }
+    .grid { grid-template-columns: 1fr; gap: 2rem; }
+    #about-page, #blog-page { padding: 3rem 1.2rem; }
+    #project-detail { padding: 1.5rem 1.2rem 3rem; }
+    footer { flex-direction: column; gap: 0.5rem; align-items: flex-start; }
+  }
+</style>
+</head>
+<body>
+
+<!-- HEADER -->
+<header>
+  <div class="site-name" onclick="showPage('projects')" style="cursor:pointer;">YOUR NAME</div>
+  <div class="header-right">
+    <nav>
+      <a href="#" class="active" id="nav-projects" onclick="showPage('projects'); return false;">Projects</a>
+      <a href="#" id="nav-blog" onclick="showPage('blog'); return false;">Blog</a>
+      <a href="#" id="nav-about" onclick="showPage('about'); return false;">About Me</a>
+    </nav>
+    <div class="header-links">
+      <a href="mailto:your@email.com">mail</a>
+      <a href="https://linkedin.com/in/yourprofile" target="_blank">linkedin</a>
+    </div>
+  </div>
+</header>
+
+<!-- MAIN -->
+<main>
+
+  <!-- PROJECTS PAGE -->
+  <div id="projects-page">
+    <!-- Filter -->
+    <div class="filter-bar">
+      <button class="filter-btn active" onclick="filterProjects('all', this)">All</button>
+      <button class="filter-btn" onclick="filterProjects('2023', this)">2023</button>
+      <button class="filter-btn" onclick="filterProjects('2024', this)">2024</button>
+      <button class="filter-btn" onclick="filterProjects('2025', this)">2025</button>
+    </div>
+
+    <!-- Grid -->
+    <div class="projects">
+      <div class="grid" id="project-grid">
+
+        <!--
+          HOW TO ADD YOUR PROJECTS:
+          1. Copy one .project-card block below
+          2. Change data-year to match your project year
+          3. Replace the placeholder SVG with: <img src="your-photo.jpg" alt="Project name">
+          4. Update .project-title and .project-year-tag text
+          5. Update the onclick detail info inside openProject()
+        -->
+
+        <div class="project-card" data-year="2025" onclick="openProject('project1')">
+          <div class="project-img-wrap">
+            <!-- REPLACE THIS with: <img src="your-image.jpg" alt="Project Title"> -->
+            <div class="placeholder-svg">
+              <svg viewBox="0 0 120 80" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <rect x="10" y="10" width="100" height="60" stroke="#111" stroke-width="0.8"/>
+                <rect x="10" y="10" width="45" height="30" stroke="#111" stroke-width="0.4"/>
+                <rect x="55" y="40" width="55" height="30" stroke="#111" stroke-width="0.4"/>
+                <rect x="70" y="48" width="18" height="22" stroke="#111" stroke-width="0.4"/>
+              </svg>
+            </div>
+          </div>
+          <div class="project-meta">
+            <div class="project-title">Project Title One</div>
+            <div class="project-year-tag">2025</div>
+          </div>
+        </div>
+
+        <div class="project-card" data-year="2025" onclick="openProject('project2')">
+          <div class="project-img-wrap">
+            <div class="placeholder-svg">
+              <svg viewBox="0 0 120 80" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <polygon points="60,5 110,75 10,75" stroke="#111" stroke-width="0.8" fill="none"/>
+                <line x1="60" y1="5" x2="60" y2="75" stroke="#111" stroke-width="0.3" stroke-dasharray="3 3"/>
+                <line x1="35" y1="40" x2="85" y2="40" stroke="#111" stroke-width="0.4"/>
+                <rect x="45" y="52" width="30" height="23" stroke="#111" stroke-width="0.4"/>
+              </svg>
+            </div>
+          </div>
+          <div class="project-meta">
+            <div class="project-title">Project Title Two</div>
+            <div class="project-year-tag">2025</div>
+          </div>
+        </div>
+
+        <div class="project-card" data-year="2024" onclick="openProject('project3')">
+          <div class="project-img-wrap">
+            <div class="placeholder-svg">
+              <svg viewBox="0 0 120 80" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <rect x="10" y="20" width="50" height="50" stroke="#111" stroke-width="0.8"/>
+                <rect x="60" y="10" width="50" height="60" stroke="#111" stroke-width="0.8"/>
+                <line x1="10" y1="45" x2="60" y2="45" stroke="#111" stroke-width="0.3" stroke-dasharray="3 3"/>
+                <rect x="65" y="42" width="15" height="28" stroke="#111" stroke-width="0.4"/>
+              </svg>
+            </div>
+          </div>
+          <div class="project-meta">
+            <div class="project-title">Project Title Three</div>
+            <div class="project-year-tag">2024</div>
+          </div>
+        </div>
+
+        <div class="project-card" data-year="2024" onclick="openProject('project4')">
+          <div class="project-img-wrap">
+            <div class="placeholder-svg">
+              <svg viewBox="0 0 120 80" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <circle cx="60" cy="40" r="30" stroke="#111" stroke-width="0.8" fill="none"/>
+                <circle cx="60" cy="40" r="14" stroke="#111" stroke-width="0.4" fill="none"/>
+                <line x1="30" y1="40" x2="90" y2="40" stroke="#111" stroke-width="0.3" stroke-dasharray="2 3"/>
+                <line x1="60" y1="10" x2="60" y2="70" stroke="#111" stroke-width="0.3" stroke-dasharray="2 3"/>
+              </svg>
+            </div>
+          </div>
+          <div class="project-meta">
+            <div class="project-title">Project Title Four</div>
+            <div class="project-year-tag">2024</div>
+          </div>
+        </div>
+
+        <div class="project-card" data-year="2023" onclick="openProject('project5')">
+          <div class="project-img-wrap">
+            <div class="placeholder-svg">
+              <svg viewBox="0 0 120 80" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <rect x="10" y="10" width="100" height="60" stroke="#111" stroke-width="0.8"/>
+                <rect x="10" y="10" width="33" height="60" stroke="#111" stroke-width="0.4"/>
+                <rect x="43" y="10" width="34" height="60" stroke="#111" stroke-width="0.4"/>
+                <rect x="50" y="38" width="20" height="32" stroke="#111" stroke-width="0.4"/>
+                <rect x="88" y="28" width="18" height="20" stroke="#111" stroke-width="0.4"/>
+              </svg>
+            </div>
+          </div>
+          <div class="project-meta">
+            <div class="project-title">Project Title Five</div>
+            <div class="project-year-tag">2023</div>
+          </div>
+        </div>
+
+        <div class="project-card" data-year="2023" onclick="openProject('project6')">
+          <div class="project-img-wrap">
+            <div class="placeholder-svg">
+              <svg viewBox="0 0 120 80" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <rect x="15" y="15" width="90" height="50" stroke="#111" stroke-width="0.8"/>
+                <line x1="15" y1="15" x2="60" y2="3" stroke="#111" stroke-width="0.5"/>
+                <line x1="105" y1="15" x2="60" y2="3" stroke="#111" stroke-width="0.5"/>
+                <rect x="42" y="38" width="36" height="27" stroke="#111" stroke-width="0.4"/>
+                <line x1="15" y1="40" x2="105" y2="40" stroke="#111" stroke-width="0.3" stroke-dasharray="2 2"/>
+              </svg>
+            </div>
+          </div>
+          <div class="project-meta">
+            <div class="project-title">Project Title Six</div>
+            <div class="project-year-tag">2023</div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </div>
+
+  <!-- ABOUT PAGE -->
+  <div id="about-page">
+    <div class="about-name">Your Name</div>
+    <div class="about-body">
+      <p>Write a short introduction about yourself here. Describe your background, education, and what drives your architectural practice. Keep it personal and honest.</p>
+      <p>You can talk about your research interests, the themes you explore in your work, and the places or cultures that have shaped your perspective as a designer.</p>
+      <p>A third paragraph about your current position, where you are based, or what you are working on now.</p>
+    </div>
+    <div class="about-info">
+      <div class="about-info-row">
+        <span class="about-info-label">Education</span>
+        <span class="about-info-value">M.Arch, [University], [Year]</span>
+      </div>
+      <div class="about-info-row">
+        <span class="about-info-label">Based in</span>
+        <span class="about-info-value">[City, Country]</span>
+      </div>
+      <div class="about-info-row">
+        <span class="about-info-label">Contact</span>
+        <span class="about-info-value"><a href="mailto:your@email.com" style="border-bottom:1px solid #111;">your@email.com</a></span>
+      </div>
+      <div class="about-info-row">
+        <span class="about-info-label">LinkedIn</span>
+        <span class="about-info-value"><a href="#" style="border-bottom:1px solid #111;">linkedin.com/in/yourprofile</a></span>
+      </div>
+    </div>
+  </div>
+
+  <!-- BLOG PAGE -->
+  <div id="blog-page">
+    <div class="blog-list">
+      <div class="blog-item">
+        <span class="blog-title">Blog Post Title One — Write a short description of this post here</span>
+        <span class="blog-date">2025.03</span>
+      </div>
+      <div class="blog-item">
+        <span class="blog-title">Blog Post Title Two — A reflection on material and memory</span>
+        <span class="blog-date">2025.01</span>
+      </div>
+      <div class="blog-item">
+        <span class="blog-title">Blog Post Title Three — Notes from a site visit</span>
+        <span class="blog-date">2024.11</span>
+      </div>
+      <div class="blog-item">
+        <span class="blog-title">Blog Post Title Four — On thresholds and in-between spaces</span>
+        <span class="blog-date">2024.08</span>
+      </div>
+      <div class="blog-item">
+        <span class="blog-title">Blog Post Title Five — Research essay on vernacular typologies</span>
+        <span class="blog-date">2024.05</span>
+      </div>
+    </div>
+  </div>
+
+</main>
+
+<!-- PROJECT DETAIL (overlay) -->
+<div id="project-detail">
+  <span class="detail-back" onclick="closeProject()">← Back</span>
+  <div class="detail-title" id="detail-title">Project Title</div>
+  <div class="detail-year" id="detail-year">2025</div>
+  <div class="detail-images" id="detail-images">
+    <!-- images injected by JS -->
+  </div>
+  <div class="detail-desc" id="detail-desc">Project description goes here.</div>
+</div>
+
+<!-- FOOTER -->
+<footer>
+  <p>© 2019–2025 Your Name. Images, drawings, and text by Your Name unless credited.</p>
+  <div class="footer-links">
+    <a href="mailto:your@email.com">mail</a>
+    <a href="https://linkedin.com/in/yourprofile" target="_blank">linkedin</a>
+  </div>
+</footer>
+
+<script>
+  // ── PROJECT DATA ──
+  // Add your project details here. For images, put filenames in the images array.
+  const projects = {
+    project1: {
+      title: 'Project Title One',
+      year: '2025',
+      images: [], // e.g. ['photo1.jpg', 'photo2.jpg']
+      description: 'Describe this project here. Talk about the brief, your concept, the site, materials, and what you were exploring. This text appears when someone clicks on the project card.',
+    },
+    project2: {
+      title: 'Project Title Two',
+      year: '2025',
+      images: [],
+      description: 'Description for project two. Replace with your own text.',
+    },
+    project3: {
+      title: 'Project Title Three',
+      year: '2024',
+      images: [],
+      description: 'Description for project three. Replace with your own text.',
+    },
+    project4: {
+      title: 'Project Title Four',
+      year: '2024',
+      images: [],
+      description: 'Description for project four. Replace with your own text.',
+    },
+    project5: {
+      title: 'Project Title Five',
+      year: '2023',
+      images: [],
+      description: 'Description for project five. Replace with your own text.',
+    },
+    project6: {
+      title: 'Project Title Six',
+      year: '2023',
+      images: [],
+      description: 'Description for project six. Replace with your own text.',
+    },
+  };
+
+  // ── PAGE SWITCHING ──
+  function showPage(page) {
+    document.getElementById('projects-page').style.display = page === 'projects' ? 'block' : 'none';
+    document.getElementById('about-page').classList.toggle('active', page === 'about');
+    document.getElementById('blog-page').classList.toggle('active', page === 'blog');
+
+    document.getElementById('nav-projects').classList.toggle('active', page === 'projects');
+    document.getElementById('nav-about').classList.toggle('active', page === 'about');
+    document.getElementById('nav-blog').classList.toggle('active', page === 'blog');
+
+    window.scrollTo(0, 0);
+  }
+
+  // ── FILTER ──
+  function filterProjects(year, btn) {
+    document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+
+    document.querySelectorAll('.project-card').forEach(card => {
+      const match = year === 'all' || card.dataset.year === year;
+      card.dataset.hidden = !match;
+      card.style.display = match ? '' : 'none';
+    });
+  }
+
+  // ── PROJECT DETAIL ──
+  function openProject(id) {
+    const p = projects[id];
+    document.getElementById('detail-title').textContent = p.title;
+    document.getElementById('detail-year').textContent = p.year;
+    document.getElementById('detail-desc').textContent = p.description;
+
+    const imgContainer = document.getElementById('detail-images');
+    imgContainer.innerHTML = '';
+
+    if (p.images && p.images.length > 0) {
+      p.images.forEach(src => {
+        const slot = document.createElement('div');
+        slot.className = 'detail-img-slot';
+        slot.innerHTML = `<img src="${src}" alt="${p.title}">`;
+        imgContainer.appendChild(slot);
+      });
+    } else {
+      // Placeholder if no images
+      const slot = document.createElement('div');
+      slot.className = 'detail-img-slot';
+      slot.innerHTML = `<div class="detail-img-placeholder">
+        <svg viewBox="0 0 120 80" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <rect x="10" y="10" width="100" height="60" stroke="#111" stroke-width="0.6"/>
+          <text x="60" y="44" text-anchor="middle" font-size="8" fill="#999" font-family="sans-serif">Add your photo here</text>
+        </svg>
+      </div>`;
+      imgContainer.appendChild(slot);
+    }
+
+    document.getElementById('project-detail').classList.add('active');
+    document.body.style.overflow = 'hidden';
+    window.scrollTo(0, 0);
+  }
+
+  function closeProject() {
+    document.getElementById('project-detail').classList.remove('active');
+    document.body.style.overflow = '';
+  }
+
+  // Close on Escape
+  document.addEventListener('keydown', e => {
+    if (e.key === 'Escape') closeProject();
+  });
+
+  // ── SCROLL REVEAL ──
+  const observer = new IntersectionObserver((entries) => {
+    entries.forEach((entry, i) => {
+      if (entry.isIntersecting) {
+        setTimeout(() => entry.target.classList.add('visible'), i * 60);
+        observer.unobserve(entry.target);
+      }
+    });
+  }, { threshold: 0.05 });
+
+  document.querySelectorAll('.project-card').forEach(el => observer.observe(el));
+</script>
+
+</body>
+</html>
